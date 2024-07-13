@@ -1,5 +1,4 @@
-import React from "react";
-import Book from "./Book";
+import React, { useState } from "react";
 import img1 from "../images/image-1.jpg";
 import img2 from "../images/image-2.jpg";
 import img3 from "../images/image-3.jpg";
@@ -46,12 +45,63 @@ export default function Books() {
       id: 6,
     },
   ];
+
+  const [bookList, setBookList] = useState(books);
+  const [givenBookId, setGivenBookId] = useState("");
+
+  const filterBook = (id) => {
+    if (isNaN(id) || id === 0) {
+      setBookList(books);
+      return;
+    }
+    const newBookList = books.filter((book) => book.id === id);
+    setBookList(
+      newBookList.length
+        ? newBookList
+        : [{ author: "", title: "No book found", img: "", id: id }]
+    );
+  };
+
   return (
     <>
       <h1>Amazon Best Sellers</h1>
+      <div
+        style={{ display: "flex", justifyContent: "center", marginTop: "2rem" }}
+      >
+        <form>
+          <button
+            className="filterBtn"
+            type="submit"
+            onClick={(e) => {
+              e.preventDefault();
+              filterBook(parseInt(givenBookId));
+            }}
+          >
+            Filter
+          </button>
+          <input
+            className="filterInput"
+            type="number"
+            placeholder="Enter id"
+            value={givenBookId}
+            onChange={(e) => {
+              const bookId = e.target.value;
+              setGivenBookId(bookId);
+            }}
+          />
+        </form>
+      </div>
       <section className="booklist">
-        {books.map((book, index) => {
-          return <Book key={book.id} {...book} number={index} />;
+        {bookList.map((book) => {
+          const { author, title, img, id } = book;
+          return (
+            <article className="book" key={id}>
+              <img src={img} alt={title} />
+              <h2>{title}</h2>
+              <h4>{author.toUpperCase()}</h4>
+              <span className="number"># {id}</span>
+            </article>
+          );
         })}
       </section>
     </>
